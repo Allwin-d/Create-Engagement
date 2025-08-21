@@ -29,11 +29,16 @@ const EngagementDatePicker = () => {
     { value: "Asia/Tokyo", label: "Japan Standard Time (JST)" },
   ];
 
-
   const convertToTimezone = (date: Date, fromTz: string, toTz: string) => {
     if (!date) return null;
-    const utc = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
-    return new Date(utc.toLocaleString("en-US", { timeZone: toTz }));
+    const fromDate = new Date(
+      date.toLocaleString("en-US", { timeZone: fromTz })
+    );
+    const toDate = new Date(
+      fromDate.toLocaleString("en-US", { timeZone: toTz })
+    );
+
+    return toDate;
   };
 
   const handleTimezoneChange = (newTimezone: string) => {
@@ -52,7 +57,6 @@ const EngagementDatePicker = () => {
     () => [primary, secondary, tertiary].filter(Boolean) as Date[],
     [primary, secondary, tertiary]
   );
-
 
   const validateUniqueTimes = (
     newDate: Date | null,
@@ -75,7 +79,6 @@ const EngagementDatePicker = () => {
     });
   };
 
-
   const handleDateChange = (
     date: Date | null,
     setter: (d: Date | null) => void,
@@ -86,19 +89,16 @@ const EngagementDatePicker = () => {
       return;
     }
 
-
     const hours = date.getHours();
     if (hours < 6 || hours > 23 || (hours === 23 && date.getMinutes() > 0)) {
       alert("Please select a time between 6:00 AM and 11:00 PM.");
       return;
     }
 
- 
     if (!validateUniqueTimes(date, currentValue)) {
       alert("This time is already selected. Please choose another.");
       return;
     }
-
 
     if (isSlotDisabled(date)) {
       alert("This time conflicts with another slot (buffer rule).");
@@ -108,13 +108,11 @@ const EngagementDatePicker = () => {
     setter(date);
   };
 
-
   const deleteSlot = (slotType: "primary" | "secondary" | "tertiary") => {
     if (slotType === "primary") setPrimary(null);
     if (slotType === "secondary") setSecondary(null);
     if (slotType === "tertiary") setTertiary(null);
   };
-
 
   const formatDateTime = (date: Date | null, tz: string) => {
     if (!date) return "";
@@ -145,10 +143,8 @@ const EngagementDatePicker = () => {
       createdAt: new Date().toISOString(),
     };
 
-  
     const existingRecords =
       JSON.parse(localStorage.getItem("engagementFull") || "[]") || [];
-
 
     existingRecords.push(fullData);
 
@@ -156,7 +152,6 @@ const EngagementDatePicker = () => {
 
     navigate("/review");
   };
-
 
   const SelectedSlot = ({
     label,
@@ -192,7 +187,6 @@ const EngagementDatePicker = () => {
       </p>
     </div>
   );
-
 
   const minTime = new Date();
   minTime.setHours(6, 0, 0, 0);
