@@ -16,9 +16,16 @@ const EngagementDatePicker = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const saved = localStorage.getItem("engagementDetails");
-    if (saved) setDetails(JSON.parse(saved));
-  }, []);
+    // FIXED: Load from the correct temporary storage key
+    const saved = localStorage.getItem("tempEngagementDetails");
+    if (saved) {
+      setDetails(JSON.parse(saved));
+    } else {
+      // If no temp data found, redirect back to form
+      alert("Please fill the engagement details first");
+      navigate("/");
+    }
+  }, [navigate]);
 
   const timezones = [
     { value: "America/New_York", label: "Eastern Time (ET)" },
@@ -160,21 +167,28 @@ const EngagementDatePicker = () => {
       alert("Primary Date and Time is required");
       return;
     }
+
+    // FIXED: Create complete record only when both steps are done
     const fullData = {
       ...details,
-      primary,
-      secondary,
-      tertiary,
+      primary: primary.toISOString(), // Convert to string for proper storage
+      secondary: secondary?.toISOString() || null,
+      tertiary: tertiary?.toISOString() || null,
       timezone,
       createdAt: new Date().toISOString(),
     };
 
-    const existingRecords =
-      JSON.parse(localStorage.getItem("engagementFull") || "[]") || [];
-
+    // Get existing complete records
+    const existingRecords = JSON.parse(
+      localStorage.getItem("engagementFull") || "[]"
+    );
     existingRecords.push(fullData);
 
+    // Save the complete record
     localStorage.setItem("engagementFull", JSON.stringify(existingRecords));
+
+    // Clean up temporary data
+    localStorage.removeItem("tempEngagementDetails");
 
     navigate("/review");
   };
@@ -340,7 +354,14 @@ const EngagementDatePicker = () => {
               </ul>
             </div>
 
-            <div className="text-center">
+            <div className="flex justify-between">
+              <button
+                type="button"
+                onClick={() => navigate("/")}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold px-8 py-3 rounded-lg shadow-lg transition"
+              >
+                Back
+              </button>
               <button
                 type="submit"
                 disabled={!primary}

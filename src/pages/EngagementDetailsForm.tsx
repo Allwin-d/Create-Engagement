@@ -19,6 +19,7 @@ const EngagementDetailsForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validation
     if (
       !details.EngagementOwner ||
       !details.Speaker ||
@@ -29,26 +30,8 @@ const EngagementDetailsForm = () => {
       return;
     }
 
-    const saved = localStorage.getItem("engagementFull");
-    let records = [];
-    if (saved) {
-      try {
-        records = JSON.parse(saved);
-        if (!Array.isArray(records)) {
-          records = [records];
-        }
-      } catch {
-        records = [];
-      }
-    }
-
-    const newRecord = {
-      ...details,
-      createdAt: new Date().toISOString(),
-    };
-    const updatedRecords = [...records, newRecord];
-
-    localStorage.setItem("engagementFull", JSON.stringify(updatedRecords));
+    // FIXED: Save to temporary storage for current session (don't save to final records yet)
+    localStorage.setItem("tempEngagementDetails", JSON.stringify(details));
 
     navigate("/datepicker");
   };
@@ -59,7 +42,6 @@ const EngagementDetailsForm = () => {
         onSubmit={handleSubmit}
         className="w-full max-w-xl bg-white shadow-lg rounded-2xl p-8 space-y-6"
       >
-        {/* Header */}
         <h2 className="text-2xl font-bold text-gray-800 text-center">
           Engagement Details
         </h2>
@@ -67,7 +49,6 @@ const EngagementDetailsForm = () => {
           Please provide the details of the engagement. All fields are required.
         </p>
 
-        {/* Engagement Owner */}
         <InputField
           label="Engagement Owner *"
           name="EngagementOwner"
@@ -78,7 +59,6 @@ const EngagementDetailsForm = () => {
           required
         />
 
-        {/* Speaker */}
         <InputField
           label="Speaker *"
           name="Speaker"
@@ -89,7 +69,6 @@ const EngagementDetailsForm = () => {
           required
         />
 
-        {/* Caterer */}
         <InputField
           label="Caterer *"
           name="Caterer"
@@ -100,7 +79,6 @@ const EngagementDetailsForm = () => {
           required
         />
 
-        {/* Cohost */}
         <InputField
           label="Cohost *"
           name="Cohost"
@@ -111,7 +89,6 @@ const EngagementDetailsForm = () => {
           required
         />
 
-        {/* Submit */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold px-4 py-3 rounded-lg shadow-md"
