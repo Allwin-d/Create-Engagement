@@ -29,16 +29,42 @@ const EngagementDatePicker = () => {
     { value: "Asia/Tokyo", label: "Japan Standard Time (JST)" },
   ];
 
-  const convertToTimezone = (date: Date, fromTz: string, toTz: string) => {
+  const convertToTimezone = (
+    date: Date,
+    fromTz: string,
+    toTz: string
+  ): Date | null => {
     if (!date) return null;
-    const fromDate = new Date(
-      date.toLocaleString("en-US", { timeZone: fromTz })
-    );
-    const toDate = new Date(
-      fromDate.toLocaleString("en-US", { timeZone: toTz })
+
+    // Step 1: Interpret the date in the source timezone
+    const dateInSourceTz = new Date(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: fromTz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).format(date)
     );
 
-    return toDate;
+    // Step 2: Convert the interpreted date to the target timezone
+    const dateInTargetTz = new Date(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: toTz,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      }).format(dateInSourceTz)
+    );
+
+    return dateInTargetTz;
   };
 
   const handleTimezoneChange = (newTimezone: string) => {
@@ -207,7 +233,7 @@ const EngagementDatePicker = () => {
 
             {/* Timezone */}
             <div className="mb-8">
-              <label className=" mb-2 font-semibold text-gray-700 flex items-center gap-2">
+              <label className="mb-2 font-semibold text-gray-700 flex items-center gap-2">
                 <Globe className="w-5 h-5 text-blue-600" />
                 Select Timezone <span className="text-red-500">*</span>
               </label>
