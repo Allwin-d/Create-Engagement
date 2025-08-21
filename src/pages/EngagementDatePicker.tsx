@@ -16,12 +16,10 @@ const EngagementDatePicker = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // FIXED: Load from the correct temporary storage key
     const saved = localStorage.getItem("tempEngagementDetails");
     if (saved) {
       setDetails(JSON.parse(saved));
     } else {
-      // If no temp data found, redirect back to form
       alert("Please fill the engagement details first");
       navigate("/");
     }
@@ -43,7 +41,7 @@ const EngagementDatePicker = () => {
   ): Date | null => {
     if (!date) return null;
 
-    // Step 1: Interpret the date in the source timezone
+
     const dateInSourceTz = new Date(
       new Intl.DateTimeFormat("en-US", {
         timeZone: fromTz,
@@ -57,7 +55,7 @@ const EngagementDatePicker = () => {
       }).format(date)
     );
 
-    // Step 2: Convert the interpreted date to the target timezone
+
     const dateInTargetTz = new Date(
       new Intl.DateTimeFormat("en-US", {
         timeZone: toTz,
@@ -168,26 +166,25 @@ const EngagementDatePicker = () => {
       return;
     }
 
-    // FIXED: Create complete record only when both steps are done
     const fullData = {
       ...details,
-      primary: primary.toISOString(), // Convert to string for proper storage
+      primary: primary.toISOString(), 
       secondary: secondary?.toISOString() || null,
       tertiary: tertiary?.toISOString() || null,
       timezone,
       createdAt: new Date().toISOString(),
     };
 
-    // Get existing complete records
+
     const existingRecords = JSON.parse(
       localStorage.getItem("engagementFull") || "[]"
     );
     existingRecords.push(fullData);
 
-    // Save the complete record
+
     localStorage.setItem("engagementFull", JSON.stringify(existingRecords));
 
-    // Clean up temporary data
+
     localStorage.removeItem("tempEngagementDetails");
 
     navigate("/review");

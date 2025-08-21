@@ -30,7 +30,7 @@ const EngagementDetailsForm = () => {
       return;
     }
 
-    // FIXED: Save to temporary storage for current session (don't save to final records yet)
+    
     localStorage.setItem("tempEngagementDetails", JSON.stringify(details));
 
     navigate("/datepicker");
