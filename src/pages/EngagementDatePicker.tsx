@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
-import { Clock, Trash2, Globe } from "lucide-react"; // ✅ nice icons
+import { Clock, Trash2, Globe } from "lucide-react";
 
 const EngagementDatePicker = () => {
   const [details, setDetails] = useState<any>({});
@@ -29,6 +29,7 @@ const EngagementDatePicker = () => {
     { value: "Asia/Tokyo", label: "Japan Standard Time (JST)" },
   ];
 
+
   const convertToTimezone = (date: Date, fromTz: string, toTz: string) => {
     if (!date) return null;
     const utc = new Date(date.toLocaleString("en-US", { timeZone: "UTC" }));
@@ -52,6 +53,7 @@ const EngagementDatePicker = () => {
     [primary, secondary, tertiary]
   );
 
+
   const validateUniqueTimes = (
     newDate: Date | null,
     currentSlot: Date | null
@@ -73,6 +75,7 @@ const EngagementDatePicker = () => {
     });
   };
 
+
   const handleDateChange = (
     date: Date | null,
     setter: (d: Date | null) => void,
@@ -82,18 +85,36 @@ const EngagementDatePicker = () => {
       setter(null);
       return;
     }
-    if (!validateUniqueTimes(date, currentValue)) {
-      alert("This date/time is already selected. Please choose another.");
+
+
+    const hours = date.getHours();
+    if (hours < 6 || hours > 23 || (hours === 23 && date.getMinutes() > 0)) {
+      alert("Please select a time between 6:00 AM and 11:00 PM.");
       return;
     }
+
+ 
+    if (!validateUniqueTimes(date, currentValue)) {
+      alert("This time is already selected. Please choose another.");
+      return;
+    }
+
+
+    if (isSlotDisabled(date)) {
+      alert("This time conflicts with another slot (buffer rule).");
+      return;
+    }
+
     setter(date);
   };
+
 
   const deleteSlot = (slotType: "primary" | "secondary" | "tertiary") => {
     if (slotType === "primary") setPrimary(null);
     if (slotType === "secondary") setSecondary(null);
     if (slotType === "tertiary") setTertiary(null);
   };
+
 
   const formatDateTime = (date: Date | null, tz: string) => {
     if (!date) return "";
@@ -123,9 +144,19 @@ const EngagementDatePicker = () => {
       timezone,
       createdAt: new Date().toISOString(),
     };
-    localStorage.setItem("engagementFull", JSON.stringify(fullData));
+
+  
+    const existingRecords =
+      JSON.parse(localStorage.getItem("engagementFull") || "[]") || [];
+
+
+    existingRecords.push(fullData);
+
+    localStorage.setItem("engagementFull", JSON.stringify(existingRecords));
+
     navigate("/review");
   };
+
 
   const SelectedSlot = ({
     label,
@@ -161,6 +192,7 @@ const EngagementDatePicker = () => {
       </p>
     </div>
   );
+
 
   const minTime = new Date();
   minTime.setHours(6, 0, 0, 0);

@@ -1,24 +1,49 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+type EngagementRecord = {
+  EngagementOwner?: string;
+  Speaker?: string;
+  Caterer?: string;
+  Cohost?: string;
+  createdAt?: string;
+  primary?: string;
+  secondary?: string;
+  tertiary?: string;
+  timezone?: string;
+};
+
 const EngagementReview = () => {
-  const [data, setData] = useState<any>(null);
+  const [records, setRecords] = useState<EngagementRecord[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("engagementFull");
     if (saved) {
-      const parsed = JSON.parse(saved);
-      // Add created timestamp if not present
-      if (!parsed.createdAt) {
-        parsed.createdAt = new Date().toISOString();
-        localStorage.setItem("engagementFull", JSON.stringify(parsed));
+      let parsed: EngagementRecord[] = [];
+
+      try {
+        const temp = JSON.parse(saved);
+
+        if (Array.isArray(temp)) {
+          parsed = temp;
+        } else if (temp && typeof temp === "object") {
+          parsed = [temp];
+        }
+      } catch (err) {
+        console.error("Error parsing engagement data", err);
       }
-      setData(parsed);
+
+      const updated = parsed.map((rec) =>
+        rec.createdAt ? rec : { ...rec, createdAt: new Date().toISOString() }
+      );
+
+      localStorage.setItem("engagementFull", JSON.stringify(updated));
+      setRecords(updated);
     }
   }, []);
 
-  if (!data) {
+  if (!records.length) {
     return (
       <div className="flex justify-center items-center min-h-screen text-gray-600">
         No engagement data found.
@@ -26,69 +51,70 @@ const EngagementReview = () => {
     );
   }
 
-  function formatDate(date: string | null | undefined) {
+  function formatDate(date: string | null | undefined, tz?: string) {
     if (!date) return "N/A";
     return new Date(date).toLocaleString(undefined, {
       dateStyle: "medium",
       timeStyle: "short",
-      timeZone: data.timezone,
+      timeZone: tz,
     });
   }
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-50 p-6">
-      <div className="w-full max-w-2xl bg-white shadow-lg rounded-2xl p-8 space-y-6">
+      <div className="w-full max-w-7xl bg-white shadow-lg rounded-2xl p-8 space-y-8">
         {/* Header */}
         <h2 className="text-2xl font-bold text-gray-800 text-center">
           Engagement Review
         </h2>
         <p className="text-sm text-gray-500 text-center">
-          Review the engagement details before final confirmation.
+          Review all saved engagement records before final confirmation.
         </p>
 
-        {/* Engagement Details */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Engagement Details
-          </h3>
-          <div className="grid grid-cols-2 gap-y-3 text-gray-700">
-            <span className="font-medium">Engagement Owner:</span>
-            <span>{data.EngagementOwner}</span>
-
-            <span className="font-medium">Speaker:</span>
-            <span>{data.Speaker}</span>
-
-            <span className="font-medium">Caterer:</span>
-            <span>{data.Caterer}</span>
-
-            <span className="font-medium">Cohost:</span>
-            <span>{data.Cohost}</span>
-
-            <span className="font-medium">Created At:</span>
-            <span>{formatDate(data.createdAt)}</span>
-          </div>
-        </div>
-
-        {/* Date & Time Details */}
-        <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-3">
-            Date & Time Selections
-          </h3>
-          <div className="grid grid-cols-2 gap-y-3 text-gray-700">
-            <span className="font-medium text-blue-600">Primary:</span>
-            <span className="text-blue-600 font-semibold">
-              {formatDate(data.primary)}
-            </span>
-
-            <span className="font-medium">Secondary:</span>
-            <span>{formatDate(data.secondary)}</span>
-
-            <span className="font-medium">Tertiary:</span>
-            <span>{formatDate(data.tertiary)}</span>
-
-            <span className="font-medium">Timezone:</span>
-            <span>{data.timezone}</span>
-          </div>
+        {/* Column Table Format */}
+        <div className="overflow-x-auto">
+          <table className="w-full border border-gray-200 rounded-lg">
+            <thead className="bg-gray-100 text-gray-700 text-sm">
+              <tr>
+                <th className="px-4 py-3 border">#</th>
+                <th className="px-4 py-3 border">Engagement Owner</th>
+                <th className="px-4 py-3 border">Speaker</th>
+                <th className="px-4 py-3 border">Caterer</th>
+                <th className="px-4 py-3 border">Cohost</th>
+                <th className="px-4 py-3 border">Created At</th>
+                <th className="px-4 py-3 border text-blue-600">Primary</th>
+                <th className="px-4 py-3 border">Secondary</th>
+                <th className="px-4 py-3 border">Tertiary</th>
+                <th className="px-4 py-3 border">Timezone</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-700 text-sm divide-y divide-gray-200">
+              {records.map((data, index) => (
+                <tr key={index} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 border text-center">{index + 1}</td>
+                  <td className="px-4 py-3 border">
+                    {data.EngagementOwner || "N/A"}
+                  </td>
+                  <td className="px-4 py-3 border">{data.Speaker || "N/A"}</td>
+                  <td className="px-4 py-3 border">{data.Caterer || "N/A"}</td>
+                  <td className="px-4 py-3 border">{data.Cohost || "N/A"}</td>
+                  <td className="px-4 py-3 border">
+                    {formatDate(data.createdAt, data.timezone)}
+                  </td>
+                  <td className="px-4 py-3 border text-blue-600 font-semibold">
+                    {formatDate(data.primary, data.timezone)}
+                  </td>
+                  <td className="px-4 py-3 border">
+                    {formatDate(data.secondary, data.timezone)}
+                  </td>
+                  <td className="px-4 py-3 border">
+                    {formatDate(data.tertiary, data.timezone)}
+                  </td>
+                  <td className="px-4 py-3 border">{data.timezone || "N/A"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
         {/* Actions */}

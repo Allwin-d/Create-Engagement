@@ -17,6 +17,7 @@ const EngagementDetailsForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (
       !details.EngagementOwner ||
       !details.Speaker ||
@@ -26,7 +27,30 @@ const EngagementDetailsForm = () => {
       alert("All text fields are required");
       return;
     }
-    localStorage.setItem("engagementDetails", JSON.stringify(details));
+
+    
+    const saved = localStorage.getItem("engagementFull");
+    let records = [];
+    if (saved) {
+      try {
+        records = JSON.parse(saved);
+        if (!Array.isArray(records)) {
+          records = [records];
+        }
+      } catch {
+        records = [];
+      }
+    }
+
+    const newRecord = {
+      ...details,
+      createdAt: new Date().toISOString(),
+    };
+    const updatedRecords = [...records, newRecord];
+
+    localStorage.setItem("engagementFull", JSON.stringify(updatedRecords));
+
+  
     navigate("/datepicker");
   };
 
@@ -44,7 +68,6 @@ const EngagementDetailsForm = () => {
           Please provide the details of the engagement. All fields are required.
         </p>
 
-        {/* Engagement Owner */}
         <div>
           <label className="block mb-2 font-semibold text-gray-700">
             Engagement Owner <span className="text-red-500">*</span>
@@ -60,7 +83,7 @@ const EngagementDetailsForm = () => {
           />
         </div>
 
-        {/* Speaker */}
+
         <div>
           <label className="block mb-2 font-semibold text-gray-700">
             Speaker <span className="text-red-500">*</span>
@@ -76,7 +99,6 @@ const EngagementDetailsForm = () => {
           />
         </div>
 
-        {/* Caterer */}
         <div>
           <label className="block mb-2 font-semibold text-gray-700">
             Caterer <span className="text-red-500">*</span>
@@ -92,7 +114,7 @@ const EngagementDetailsForm = () => {
           />
         </div>
 
-        {/* Cohost */}
+
         <div>
           <label className="block mb-2 font-semibold text-gray-700">
             Cohost <span className="text-red-500">*</span>
@@ -108,7 +130,7 @@ const EngagementDetailsForm = () => {
           />
         </div>
 
-        {/* Submit Button */}
+ 
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold px-4 py-3 rounded-lg shadow-md"
