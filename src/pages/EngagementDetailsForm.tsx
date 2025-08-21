@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import InputField from "../components/InputField";
 
 const EngagementDetailsForm = () => {
   const [details, setDetails] = useState({
@@ -28,7 +29,6 @@ const EngagementDetailsForm = () => {
       return;
     }
 
-    
     const saved = localStorage.getItem("engagementFull");
     let records = [];
     if (saved) {
@@ -50,7 +50,6 @@ const EngagementDetailsForm = () => {
 
     localStorage.setItem("engagementFull", JSON.stringify(updatedRecords));
 
-  
     navigate("/datepicker");
   };
 
@@ -68,69 +67,51 @@ const EngagementDetailsForm = () => {
           Please provide the details of the engagement. All fields are required.
         </p>
 
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Engagement Owner <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="EngagementOwner"
-            value={details.EngagementOwner}
-            onChange={handleChange}
-            placeholder="Enter Engagement Owner"
-            required
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
+        {/* Engagement Owner */}
+        <InputField
+          label="Engagement Owner *"
+          name="EngagementOwner"
+          type="text"
+          value={details.EngagementOwner}
+          onChange={handleChange}
+          placeholder="Enter Engagement Owner"
+          required
+        />
 
+        {/* Speaker */}
+        <InputField
+          label="Speaker *"
+          name="Speaker"
+          type="text"
+          value={details.Speaker}
+          onChange={handleChange}
+          placeholder="Enter Speaker Name"
+          required
+        />
 
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Speaker <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="Speaker"
-            value={details.Speaker}
-            onChange={handleChange}
-            placeholder="Enter Speaker Name"
-            required
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
+        {/* Caterer */}
+        <InputField
+          label="Caterer *"
+          name="Caterer"
+          type="text"
+          value={details.Caterer}
+          onChange={handleChange}
+          placeholder="Enter Caterer"
+          required
+        />
 
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Caterer <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="Caterer"
-            value={details.Caterer}
-            onChange={handleChange}
-            placeholder="Enter Caterer"
-            required
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
+        {/* Cohost */}
+        <InputField
+          label="Cohost *"
+          name="Cohost"
+          type="text"
+          value={details.Cohost}
+          onChange={handleChange}
+          placeholder="Enter Cohost"
+          required
+        />
 
-
-        <div>
-          <label className="block mb-2 font-semibold text-gray-700">
-            Cohost <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            name="Cohost"
-            value={details.Cohost}
-            onChange={handleChange}
-            placeholder="Enter Cohost"
-            required
-            className="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-          />
-        </div>
-
- 
+        {/* Submit */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 transition-colors text-white font-semibold px-4 py-3 rounded-lg shadow-md"
